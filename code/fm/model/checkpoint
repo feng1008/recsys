@@ -1,0 +1,3 @@
+model_checkpoint_path: "fm_1000"
+all_model_checkpoint_paths: "fm_500"
+all_model_checkpoint_paths: "fm_1000"
