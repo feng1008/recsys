@@ -42,7 +42,7 @@ class DeepFM(object):
 		cols = ['user', 'item', 'rating', 'timestamp']
 		# import pdb;pdb.set_trace()
 		df  = pd.read_csv(file_name, delimiter='\t', names = cols, dtype = 'S32')
-		label = df[['rating']].astype('float')
+		label = df[['rating']].astype('float') / 5
 		if not os.path.exists(self.feature_dict):
 			one_hot_data = enc.fit_transform(df[['user', 'item']].values)
 			pickle.dump(enc, open(self.feature_dict, 'wb'))
@@ -98,8 +98,8 @@ class DeepFM(object):
 			return nn_output[-1]
 
 	def predict(self, x):
-		fm_result = self.fm_predict(x)
-		nn_result = self.nn_predict(x)
+		fm_result = self.fm_predict(x) * 5 
+		nn_result = self.nn_predict(x) * 5 
 		return tf.add(fm_result, nn_result)
 		# return nn_result
 		# return fm_result
