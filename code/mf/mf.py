@@ -26,6 +26,8 @@ class MF(object):
 		self.test_data = test_data
 		self.save_file = save_file
 
+		self.all_data = os.path.join(DATA_PATH, 'all.test')
+
 		self.N_EPOCHS = 1000
 		self.feature_dict = os.path.join(MODEL_PATH, 'user_item.dict')
 
@@ -60,17 +62,22 @@ class MF(object):
 		result_flat = tf.reshape(result, [-1])
 		return tf.gather(result_flat, self.user_indecies * tf.shape(result)[1] + self.item_indecies, name = 'extrace_rating')
 
+	def load_data(self):
+		df = pd.read_csv('../data/all.test', sep='\t', names=['user', 'item', 'rate', 'time'])[['user', 'item', 'rate']]
+		n, p = df.shape
+		msk = np.random.rand(len(df)) < 0.7
+		train_data = df[msk][['user', 'item']]
+		test_data = df[~msk][['user', 'item']]
+		train_rating = df[msk].rate.values
+		test_rating = df[~msk].rate.values
+		return train_data, test_data, train_rating, test_rating
+
 	def train(self):
 		# train_x, train_y = self.load_data(self.train_data)
 		# all_data_x, all_data_y = self.load_data(DATA_PATH + '/all.test')
 		# train_x, test_x, train_y, test_y = train_test_split(all_data_x, all_data_y, test_size = 0.3)
 		# n, p = all_data_x.shape
-
-		df = pd.read_csv('../data/all.test', sep='\t', names=['user', 'item', 'rate', 'time'])
-		n, p = df.shape
-		msk = np.random.rand(len(df)) < 0.7
-		df_train = df[msk]
-		rating = df_train.rate.values
+		train_data, test_data, train_rating, test_rating = self.load_data()
 
 		self.user_indecies = [x - 1 for x in df_train.user.values]
 		self.item_indecies = [x - 1 for x in df_train.item.values]
